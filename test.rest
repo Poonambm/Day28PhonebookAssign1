@@ -7,3 +7,11 @@
 #GET http://localhost:3001/api/persons/10
 
 #DELETE http://localhost:3001/api/persons/2
+POST http://localhost:3001/api/persons/ HTTP/1.1
+content-type: application/json
+Authorization: token xxx
+
+{
+    "name": "Pooiam-n",
+    "number": "803-12-1882"
+}

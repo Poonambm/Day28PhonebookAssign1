@@ -1,7 +1,16 @@
 const express = require('express')
+var morgan = require('morgan')
 const app = express()
 app.use(express.json())
+app.use(morgan('tiny'))
 
+//step 3.8
+morgan.token('ob', function (req, res) { 
+  if (req.method === 'POST'){
+  console.log("ob", req.body)
+  return `${JSON.stringify(req.body)}` }})
+
+app.use(morgan(':method :url :status :response-time :req[header] :ob'))
 let persons = [
     { 
       "id": 1,
@@ -29,8 +38,8 @@ app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
   })
 
-  //step 1
-app.get('/api/persons', (request, response) => {
+  //step 1 & 3.7
+app.get('/api/persons', morgan('tiny'), (request, response) => {
   response.json(persons);
 });
 //step 3
@@ -58,7 +67,36 @@ app.delete('/api/persons/:id', (request, response) => {
 
 // step5
 app.post('/api/persons/', (request, response) => {
-    
+  if(request.body.name === undefined || request.body.name ==''){
+    response.status(500).json({ 
+    error: 'name is missing' 
+    }).end()
+    return false;
+}
+
+if(request.body.number === undefined || request.body.number ==''){
+    response.status(500).json({ 
+    error: 'number is missing' 
+    }).end()
+    return false;
+}
+
+const person = persons.find(obj => obj.name === request.body.name)
+
+if (person) {
+    response.status(500).json({ 
+        error: ' The name already exists in the phonebook ! ' 
+    }).end()
+    return false;
+} else {
+    let newPerson = { 
+        id : Math.random(),
+        name:request.body.name ,
+        number : request.body.number
+    }
+
+    persons = persons.concat(newPerson)
+} 
 });
   
 const PORT = 3001
